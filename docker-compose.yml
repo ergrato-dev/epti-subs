@@ -18,9 +18,9 @@ services:
 
   api:
     build:
-      context: .           # root del monorepo — contiene pnpm-lock.yaml
+      context: . # root del monorepo — contiene pnpm-lock.yaml
       dockerfile: api/Dockerfile
-      target: builder      # usa la stage de build para hot-reload con tsx
+      target: builder # usa la stage de build para hot-reload con tsx
     working_dir: /app/api
     command: pnpm dev
     ports:
@@ -37,7 +37,7 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - ./api/src:/app/api/src          # hot-reload: cambios en src se reflejan al instante
+      - ./api/src:/app/api/src # hot-reload: cambios en src se reflejan al instante
       - ./api/tsconfig.json:/app/api/tsconfig.json
 
 volumes:
