@@ -2,6 +2,20 @@
 
 Gestor personal de suscripciones. Monorepo con API REST y app móvil (Android).
 
+## Roadmap
+
+| Fase | Descripción | Estado |
+|------|-------------|--------|
+| 0 | Security audit — CVEs dependencias, `@clerk/express` pinado a `2.0.7` | ✅ Completo |
+| 1 | API skeleton — Express 5, Drizzle ORM, rutas CRUD, Docker, GitHub Actions CI | ✅ Completo |
+| 2 | Expo mobile setup — Router, Clerk, i18n, tema, EAS, todas las dependencias | ✅ Completo |
+| 3 | Auth screens — onboarding, sign-in, sign-up (2-step), auth guards | ✅ Completo |
+| 4 | Core screens — home, subscriptions, insights, settings, detail, form | ✅ Completo |
+| 5 | PostHog + notificaciones locales + preferencias de moneda persistentes | ✅ Completo |
+| 6 | Integración end-to-end — app conectada a la API real en device/emulador | ⬜ Pendiente |
+| 7 | EAS build — APK preview firmado, pruebas en device sin Expo Go | ⬜ Pendiente |
+| 8 | Deploy producción — VPS Hostinger, dominio, HTTPS, variables de entorno prod | ⬜ Pendiente |
+
 ```
 epti-subs/
 ├── api/        Express 5 + Drizzle ORM + PostgreSQL
