@@ -1,9 +1,9 @@
-import { Router, type Router as ExpressRouter } from 'express';
-import { requireAuth } from '@clerk/express';
-import { and, eq, gte, lte } from 'drizzle-orm';
-import { db } from '../db/index.js';
-import { subscriptions } from '../db/schema.js';
-import { getRequiredUserId } from '../middleware/clerkAuth.js';
+import { Router, type Router as ExpressRouter } from "express";
+import { requireAuth } from "@clerk/express";
+import { and, eq, gte, lte } from "drizzle-orm";
+import { db } from "../db/index.js";
+import { subscriptions } from "../db/schema.js";
+import { getRequiredUserId } from "../middleware/clerkAuth.js";
 
 const router: ExpressRouter = Router();
 

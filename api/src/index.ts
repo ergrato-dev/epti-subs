@@ -1,10 +1,10 @@
 import "dotenv/config";
-import express, { type Express } from 'express';
-import cors from 'cors';
-import { clerkMiddleware } from '@clerk/express';
-import { HttpError } from './middleware/clerkAuth.js';
-import subscriptionsRouter from './routes/subscriptions.js';
-import insightsRouter from './routes/insights.js';
+import express, { type Express } from "express";
+import cors from "cors";
+import { clerkMiddleware } from "@clerk/express";
+import { HttpError } from "./middleware/clerkAuth.js";
+import subscriptionsRouter from "./routes/subscriptions.js";
+import insightsRouter from "./routes/insights.js";
 
 const app: Express = express();
 const PORT = Number(process.env.PORT) || 3000;
