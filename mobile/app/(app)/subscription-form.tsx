@@ -64,7 +64,10 @@ export default function SubscriptionFormScreen() {
   const [saving, setSaving] = useState(false);
 
   // Estado de los indicadores de scroll del picker de colores
-  const [colorScroll, setColorScroll] = useState({ atStart: true, atEnd: false });
+  const [colorScroll, setColorScroll] = useState({
+    atStart: true,
+    atEnd: false,
+  });
   const colorContentW = useRef(0);
   const colorContainerW = useRef(0);
   function handleColorScroll(x: number) {
@@ -307,12 +310,18 @@ export default function SubscriptionFormScreen() {
             ))}
           </ScrollView>
           {!colorScroll.atStart && (
-            <View style={[styles.colorArrow, styles.colorArrowLeft]} pointerEvents="none">
+            <View
+              style={[styles.colorArrow, styles.colorArrowLeft]}
+              pointerEvents="none"
+            >
               <Text style={styles.colorArrowText}>‹</Text>
             </View>
           )}
           {!colorScroll.atEnd && (
-            <View style={[styles.colorArrow, styles.colorArrowRight]} pointerEvents="none">
+            <View
+              style={[styles.colorArrow, styles.colorArrowRight]}
+              pointerEvents="none"
+            >
               <Text style={styles.colorArrowText}>›</Text>
             </View>
           )}
