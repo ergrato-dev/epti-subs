@@ -25,14 +25,8 @@ const BILLING_CYCLES: BillingCycle[] = [
   "daily",
 ];
 const CURRENCIES = ["COP", "USD", "EUR", "MXN", "BRL"];
-const CARD_COLORS = [
-  "#7C3AED",
-  "#0891B2",
-  "#059669",
-  "#D97706",
-  "#DC2626",
-  "#DB2777",
-];
+// Paleta de 20 colores — fuente de verdad en constants/Colors.ts
+const CARD_COLORS = Colors.subscriptionColors;
 
 interface FormState {
   name: string;
@@ -271,7 +265,12 @@ export default function SubscriptionFormScreen() {
 
         {/* Color */}
         <Label>Color</Label>
-        <View style={styles.colorRow}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.colorScroll}
+          contentContainerStyle={styles.colorRow}
+        >
           {CARD_COLORS.map((c) => (
             <Pressable
               key={c}
@@ -283,7 +282,7 @@ export default function SubscriptionFormScreen() {
               onPress={() => set("color", c)}
             />
           ))}
-        </View>
+        </ScrollView>
       </ScrollView>
     </View>
   );
@@ -365,10 +364,14 @@ const styles = StyleSheet.create({
     color: Colors.accent,
     fontWeight: Typography.weights.semibold,
   },
+  colorScroll: {
+    marginBottom: Spacing.sm,
+  },
   colorRow: {
     flexDirection: "row",
     gap: Spacing.base,
-    marginBottom: Spacing.sm,
+    paddingVertical: Spacing.xs,
+    paddingHorizontal: 2,
   },
   colorDot: { width: 32, height: 32, borderRadius: 16 },
   colorDotActive: {
