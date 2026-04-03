@@ -7,6 +7,9 @@
     "pnpm": ">=9"
   },
   "pnpm": {
+    "overrides": {
+      "expo-crypto": "15.0.8"
+    },
     "onlyBuiltDependencies": [
       "@clerk/shared",
       "@shopify/react-native-skia",
