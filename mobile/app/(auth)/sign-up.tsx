@@ -11,9 +11,9 @@ import {
   ActivityIndicator,
   Alert,
 } from "react-native";
-import { useSignUp } from "@clerk/clerk-expo";
 import { useRouter, Link } from "expo-router";
 import { useTranslation } from "react-i18next";
+import { supabase } from "../../lib/supabase";
 import { Colors } from "../../constants/Colors";
 import { Typography, Spacing, Radius } from "../../constants/Theme";
 
@@ -21,7 +21,6 @@ type Step = "form" | "verify";
 
 export default function SignUpScreen() {
   const { t } = useTranslation();
-  const { signUp, setActive, isLoaded } = useSignUp();
   const router = useRouter();
 
   const [step, setStep] = useState<Step>("form");
@@ -31,44 +30,43 @@ export default function SignUpScreen() {
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ── Step 1: crear cuenta y pedir verificación de email ────────────────────
+  // Paso 1: crear cuenta y pedir verificacion de email
   async function handleSignUp() {
-    if (!isLoaded) return;
     setLoading(true);
-    try {
-      await signUp.create({
-        emailAddress: email.trim().toLowerCase(),
-        password,
-        firstName: firstName.trim(),
-      });
+    const { error } = await supabase.auth.signUp({
+      email: email.trim().toLowerCase(),
+      password,
+      options: {
+        data: { first_name: firstName.trim() },
+        // Supabase envia OTP al email para verificacion
+        emailRedirectTo: undefined,
+      },
+    });
+    setLoading(false);
 
-      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
-      setStep("verify");
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : t("common.error");
-      Alert.alert("Error", message);
-    } finally {
-      setLoading(false);
+    if (error) {
+      Alert.alert("Error", error.message);
+      return;
     }
+    // Supabase envia OTP de 6 digitos al email
+    setStep("verify");
   }
 
-  // ── Step 2: verificar el código de email ──────────────────────────────────
+  // Paso 2: verificar el OTP de email
   async function handleVerify() {
-    if (!isLoaded) return;
     setLoading(true);
-    try {
-      const result = await signUp.attemptEmailAddressVerification({ code });
+    const { error } = await supabase.auth.verifyOtp({
+      email: email.trim().toLowerCase(),
+      token: code,
+      type: "signup",
+    });
+    setLoading(false);
 
-      if (result.status === "complete") {
-        await setActive({ session: result.createdSessionId });
-        router.replace("/(app)/(tabs)/home");
-      }
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : t("common.error");
-      Alert.alert("Error", message);
-    } finally {
-      setLoading(false);
+    if (error) {
+      Alert.alert("Error", error.message);
+      return;
     }
+    router.replace("/(app)/(tabs)/home");
   }
 
   if (step === "verify") {
@@ -84,11 +82,11 @@ export default function SignUpScreen() {
           <View style={styles.card}>
             <Text style={styles.title}>Verifica tu correo</Text>
             <Text style={styles.subtitle}>
-              Ingresa el código que enviamos a {email}
+              Ingresa el codigo que enviamos a {email}
             </Text>
 
             <View style={styles.fieldGroup}>
-              <Text style={styles.label}>Código</Text>
+              <Text style={styles.label}>Codigo</Text>
               <TextInput
                 style={[styles.input, styles.codeInput]}
                 placeholder="000000"
@@ -130,25 +128,21 @@ export default function SignUpScreen() {
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Header */}
         <View style={styles.header}>
           <View style={styles.logo}>
             <Text style={styles.logoText}>R</Text>
           </View>
           <Text style={styles.appName}>Epti Subs</Text>
-          <Text style={styles.appTagline}>SMART BILLING</Text>
         </View>
 
-        {/* Card */}
         <View style={styles.card}>
           <Text style={styles.title}>{t("auth.createAccount")}</Text>
-          <Text style={styles.subtitle}>{t("auth.signInSubtitle")}</Text>
 
           <View style={styles.fieldGroup}>
-            <Text style={styles.label}>Nombre</Text>
+            <Text style={styles.label}>{t("auth.firstName")}</Text>
             <TextInput
               style={styles.input}
-              placeholder="Tu nombre"
+              placeholder={t("auth.firstNamePlaceholder")}
               placeholderTextColor={Colors.textMuted}
               autoCapitalize="words"
               value={firstName}
@@ -194,12 +188,12 @@ export default function SignUpScreen() {
             {loading ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text style={styles.buttonText}>{t("auth.signUp")}</Text>
+              <Text style={styles.buttonText}>{t("auth.createAccount")}</Text>
             )}
           </Pressable>
 
           <Text style={styles.footer}>
-            {t("auth.alreadyAccount", { link: "" })}{" "}
+            {t("auth.hasAccount")}{" "}
             <Link href="/(auth)/sign-in" style={styles.link}>
               {t("auth.signIn")}
             </Link>
@@ -211,10 +205,7 @@ export default function SignUpScreen() {
 }
 
 const styles = StyleSheet.create({
-  flex: {
-    flex: 1,
-    backgroundColor: Colors.bg,
-  },
+  flex: { flex: 1, backgroundColor: Colors.bg },
   container: {
     flexGrow: 1,
     justifyContent: "center",
@@ -222,10 +213,7 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing["3xl"],
     gap: Spacing.xl,
   },
-  header: {
-    alignItems: "center",
-    gap: Spacing.xs,
-  },
+  header: { alignItems: "center", gap: Spacing.xs },
   logo: {
     width: 52,
     height: 52,
@@ -244,12 +232,6 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weights.bold,
     color: Colors.textPrimary,
   },
-  appTagline: {
-    fontSize: Typography.sizes.xs,
-    fontWeight: Typography.weights.semibold,
-    color: Colors.textSecondary,
-    letterSpacing: 2,
-  },
   card: {
     backgroundColor: Colors.bgCard,
     borderRadius: Radius.xl,
@@ -262,14 +244,7 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
     marginBottom: Spacing.xs,
   },
-  subtitle: {
-    fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
-    marginBottom: Spacing.md,
-  },
-  fieldGroup: {
-    gap: Spacing.xs,
-  },
+  fieldGroup: { gap: Spacing.xs },
   label: {
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.medium,
@@ -297,12 +272,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: Spacing.sm,
   },
-  buttonPressed: {
-    opacity: 0.85,
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
+  buttonPressed: { opacity: 0.85 },
+  buttonDisabled: { opacity: 0.6 },
   buttonText: {
     fontSize: Typography.sizes.base,
     fontWeight: Typography.weights.semibold,
@@ -314,8 +285,5 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     marginTop: Spacing.sm,
   },
-  link: {
-    color: Colors.accent,
-    fontWeight: Typography.weights.semibold,
-  },
+  link: { color: Colors.accent, fontWeight: Typography.weights.semibold },
 });

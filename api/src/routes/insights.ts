@@ -1,14 +1,13 @@
 import { Router, type Router as ExpressRouter } from "express";
-import { requireAuth } from "@clerk/express";
 import { and, eq, gte, lte } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { subscriptions } from "../db/schema.js";
-import { getRequiredUserId } from "../middleware/clerkAuth.js";
+import { supabaseAuth, getRequiredUserId } from "../middleware/supabaseAuth.js";
 
 const router: ExpressRouter = Router();
 
 // ─── GET /insights/monthly?year=2026&month=4 ──────────────────────────────────
-router.get("/monthly", requireAuth(), async (req, res) => {
+router.get("/monthly", supabaseAuth, async (req, res) => {
   const userId = getRequiredUserId(req);
 
   const year = Number(req.query.year) || new Date().getFullYear();
@@ -22,7 +21,7 @@ router.get("/monthly", requireAuth(), async (req, res) => {
     .from(subscriptions)
     .where(
       and(
-        eq(subscriptions.clerkUserId, userId),
+        eq(subscriptions.userId, userId),
         eq(subscriptions.active, true),
         gte(subscriptions.nextPaymentDate, startDate),
         lte(subscriptions.nextPaymentDate, endDate),

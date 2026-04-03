@@ -1,8 +1,7 @@
 import "dotenv/config";
 import express, { type Express } from "express";
 import cors from "cors";
-import { clerkMiddleware } from "@clerk/express";
-import { HttpError } from "./middleware/clerkAuth.js";
+import { HttpError } from "./middleware/supabaseAuth.js";
 import subscriptionsRouter from "./routes/subscriptions.js";
 import insightsRouter from "./routes/insights.js";
 
@@ -29,9 +28,6 @@ app.use(
 
 // ─── Body parsing (10 kb limit to mitigate large payload attacks) ─────────────
 app.use(express.json({ limit: "10kb" }));
-
-// ─── Clerk authentication middleware (populates req.auth) ─────────────────────
-app.use(clerkMiddleware());
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 app.get("/health", (_req, res) => {
@@ -62,9 +58,11 @@ app.use(
   },
 );
 
-// ─── Start ────────────────────────────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`[API] Listening on http://localhost:${PORT}`);
-});
+// ─── Start (solo fuera del entorno de tests) ──────────────────────────────────
+if (!process.env.VITEST) {
+  app.listen(PORT, () => {
+    console.log(`[API] Listening on http://localhost:${PORT}`);
+  });
+}
 
 export default app;

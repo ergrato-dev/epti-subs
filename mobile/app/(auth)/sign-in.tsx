@@ -11,15 +11,14 @@ import {
   ActivityIndicator,
   Alert,
 } from "react-native";
-import { useSignIn } from "@clerk/clerk-expo";
 import { useRouter, Link } from "expo-router";
 import { useTranslation } from "react-i18next";
+import { supabase } from "../../lib/supabase";
 import { Colors } from "../../constants/Colors";
 import { Typography, Spacing, Radius } from "../../constants/Theme";
 
 export default function SignInScreen() {
   const { t } = useTranslation();
-  const { signIn, setActive, isLoaded } = useSignIn();
   const router = useRouter();
 
   const [email, setEmail] = useState("");
@@ -27,24 +26,19 @@ export default function SignInScreen() {
   const [loading, setLoading] = useState(false);
 
   async function handleSignIn() {
-    if (!isLoaded) return;
     setLoading(true);
-    try {
-      const result = await signIn.create({
-        identifier: email.trim().toLowerCase(),
-        password,
-      });
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email.trim().toLowerCase(),
+      password,
+    });
+    setLoading(false);
 
-      if (result.status === "complete") {
-        await setActive({ session: result.createdSessionId });
-        router.replace("/(app)/(tabs)/home");
-      }
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : t("common.error");
-      Alert.alert("Error", message);
-    } finally {
-      setLoading(false);
+    if (error) {
+      Alert.alert("Error", error.message);
+      return;
     }
+    // onAuthStateChange en _layout.tsx detecta la sesion y redirige
+    router.replace("/(app)/(tabs)/home");
   }
 
   return (
@@ -125,10 +119,7 @@ export default function SignInScreen() {
 }
 
 const styles = StyleSheet.create({
-  flex: {
-    flex: 1,
-    backgroundColor: Colors.bg,
-  },
+  flex: { flex: 1, backgroundColor: Colors.bg },
   container: {
     flexGrow: 1,
     justifyContent: "center",
@@ -136,10 +127,7 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing["3xl"],
     gap: Spacing.xl,
   },
-  header: {
-    alignItems: "center",
-    gap: Spacing.xs,
-  },
+  header: { alignItems: "center", gap: Spacing.xs },
   logo: {
     width: 52,
     height: 52,
@@ -181,9 +169,7 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     marginBottom: Spacing.md,
   },
-  fieldGroup: {
-    gap: Spacing.xs,
-  },
+  fieldGroup: { gap: Spacing.xs },
   label: {
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.medium,
@@ -206,12 +192,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: Spacing.sm,
   },
-  buttonPressed: {
-    opacity: 0.85,
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
+  buttonPressed: { opacity: 0.85 },
+  buttonDisabled: { opacity: 0.6 },
   buttonText: {
     fontSize: Typography.sizes.base,
     fontWeight: Typography.weights.semibold,
@@ -223,8 +205,5 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     marginTop: Spacing.sm,
   },
-  link: {
-    color: Colors.accent,
-    fontWeight: Typography.weights.semibold,
-  },
+  link: { color: Colors.accent, fontWeight: Typography.weights.semibold },
 });

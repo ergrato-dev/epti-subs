@@ -1,14 +1,17 @@
 import { Router, type Router as ExpressRouter } from "express";
-import { requireAuth } from "@clerk/express";
 import { and, eq, gte, lte } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { subscriptions } from "../db/schema.js";
-import { getRequiredUserId, HttpError } from "../middleware/clerkAuth.js";
+import {
+  supabaseAuth,
+  getRequiredUserId,
+  HttpError,
+} from "../middleware/supabaseAuth.js";
 
 const router: ExpressRouter = Router();
 
 // ─── GET /subscriptions ───────────────────────────────────────────────────────
-router.get("/", requireAuth(), async (req, res) => {
+router.get("/", supabaseAuth, async (req, res) => {
   const userId = getRequiredUserId(req);
 
   const result = await db
@@ -26,7 +29,7 @@ router.get("/", requireAuth(), async (req, res) => {
 
 // ─── GET /subscriptions/upcoming ─────────────────────────────────────────────
 // Must be defined BEFORE /:id to avoid route shadowing
-router.get("/upcoming", requireAuth(), async (req, res) => {
+router.get("/upcoming", supabaseAuth, async (req, res) => {
   const userId = getRequiredUserId(req);
 
   const today = new Date().toISOString().split("T")[0];
@@ -50,7 +53,7 @@ router.get("/upcoming", requireAuth(), async (req, res) => {
 });
 
 // ─── GET /subscriptions/:id ───────────────────────────────────────────────────
-router.get("/:id", requireAuth(), async (req, res) => {
+router.get("/:id", supabaseAuth, async (req, res) => {
   const userId = getRequiredUserId(req);
   const id = Number(req.params.id);
   if (isNaN(id)) throw new HttpError(400, "Invalid id");
@@ -67,7 +70,7 @@ router.get("/:id", requireAuth(), async (req, res) => {
 });
 
 // ─── POST /subscriptions ──────────────────────────────────────────────────────
-router.post("/", requireAuth(), async (req, res) => {
+router.post("/", supabaseAuth, async (req, res) => {
   const userId = getRequiredUserId(req);
 
   const {
@@ -90,7 +93,7 @@ router.post("/", requireAuth(), async (req, res) => {
   const [created] = await db
     .insert(subscriptions)
     .values({
-      clerkUserId: userId,
+      userId: userId,
       name: String(name),
       logoUrl: logoUrl ? String(logoUrl) : null,
       cost: String(cost),
@@ -108,7 +111,7 @@ router.post("/", requireAuth(), async (req, res) => {
 });
 
 // ─── PUT /subscriptions/:id ───────────────────────────────────────────────────
-router.put("/:id", requireAuth(), async (req, res) => {
+router.put("/:id", supabaseAuth, async (req, res) => {
   const userId = getRequiredUserId(req);
   const id = Number(req.params.id);
   if (isNaN(id)) throw new HttpError(400, "Invalid id");
@@ -149,7 +152,7 @@ router.put("/:id", requireAuth(), async (req, res) => {
       ...(active !== undefined && { active: Boolean(active) }),
       updatedAt: new Date(),
     })
-    .where(and(eq(subscriptions.id, id), eq(subscriptions.clerkUserId, userId)))
+    .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)))
     .returning();
 
   if (!updated) throw new HttpError(404, "Subscription not found");
@@ -157,7 +160,7 @@ router.put("/:id", requireAuth(), async (req, res) => {
 });
 
 // ─── DELETE /subscriptions/:id (soft delete) ──────────────────────────────────
-router.delete("/:id", requireAuth(), async (req, res) => {
+router.delete("/:id", supabaseAuth, async (req, res) => {
   const userId = getRequiredUserId(req);
   const id = Number(req.params.id);
   if (isNaN(id)) throw new HttpError(400, "Invalid id");
@@ -165,7 +168,7 @@ router.delete("/:id", requireAuth(), async (req, res) => {
   const [deleted] = await db
     .update(subscriptions)
     .set({ active: false, updatedAt: new Date() })
-    .where(and(eq(subscriptions.id, id), eq(subscriptions.clerkUserId, userId)))
+    .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)))
     .returning();
 
   if (!deleted) throw new HttpError(404, "Subscription not found");

@@ -1,14 +1,24 @@
-import { Stack } from "expo-router";
-import { useAuth } from "@clerk/clerk-expo";
-import { Redirect } from "expo-router";
+import { useEffect, useState } from "react";
+import { Stack, Redirect } from "expo-router";
+import { supabase } from "../../lib/supabase";
+import type { Session } from "@supabase/supabase-js";
 
 export default function AuthLayout() {
-  const { isSignedIn, isLoaded } = useAuth();
+  const [session, setSession] = useState<Session | null | undefined>(undefined);
 
-  if (!isLoaded) return null;
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session: s } }) => setSession(s));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) =>
+      setSession(s),
+    );
+    return () => subscription.unsubscribe();
+  }, []);
 
-  // Si ya está autenticado, no tiene sentido mostrar auth screens
-  if (isSignedIn) return <Redirect href="/(app)/(tabs)/home" />;
+  // Cargando sesion
+  if (session === undefined) return null;
+
+  // Si ya esta autenticado, ir directo a la app
+  if (session) return <Redirect href="/(app)/(tabs)/home" />;
 
   return <Stack screenOptions={{ headerShown: false, animation: "fade" }} />;
 }

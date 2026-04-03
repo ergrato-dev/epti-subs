@@ -7,7 +7,7 @@ export type BillingCycle =
 
 export interface Subscription {
   id: number;
-  clerkUserId: string;
+  userId: string;
   name: string;
   logoUrl: string | null;
   cost: string;

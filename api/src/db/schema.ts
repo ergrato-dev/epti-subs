@@ -31,7 +31,7 @@ export const categories = pgTable("categories", {
 
 export const subscriptions = pgTable("subscriptions", {
   id: serial("id").primaryKey(),
-  clerkUserId: varchar("clerk_user_id", { length: 255 }).notNull(),
+  userId: varchar("user_id", { length: 255 }).notNull(),
   name: varchar("name", { length: 255 }).notNull(),
   logoUrl: text("logo_url"),
   cost: numeric("cost", { precision: 12, scale: 2 }).notNull(),
