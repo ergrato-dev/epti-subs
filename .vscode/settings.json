@@ -1,4 +1,30 @@
 {
+  // ── TypeScript ─────────────────────────────────────────────────────────────
+  "typescript.tsdk": "mobile/node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+
+  // ── Editor ─────────────────────────────────────────────────────────────────
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.tabSize": 2,
+  "[typescript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[typescriptreact]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[json]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+
+  // ── Files ──────────────────────────────────────────────────────────────────
+  "files.exclude": {
+    "**/.expo": true,
+    "**/node_modules": true,
+    "**/.git": false
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/.expo": true,
+    "**/pnpm-lock.yaml": true
+  },
+
+  // ── Peacock / Tema ─────────────────────────────────────────────────────────
   "workbench.colorCustomizations": {
     "activityBar.activeBackground": "#142c51",
     "activityBar.background": "#142c51",
