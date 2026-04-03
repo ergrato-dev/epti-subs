@@ -20,17 +20,25 @@ function GeometricBackground() {
   return (
     <View style={geo.container} pointerEvents="none">
       {/* Círculo grande naranja/accent arriba-derecha */}
-      <View style={[geo.shape, geo.circleLg, { backgroundColor: Colors.accent }]} />
+      <View
+        style={[geo.shape, geo.circleLg, { backgroundColor: Colors.accent }]}
+      />
       {/* Semicírculo beige arriba-izquierda */}
       <View style={[geo.shape, geo.semiLeft, { backgroundColor: "#E8E0D0" }]} />
       {/* Círculo teal centro */}
       <View style={[geo.shape, geo.circleMd, { backgroundColor: "#0D9488" }]} />
       {/* Cuadrado redondeado azul oscuro */}
-      <View style={[geo.shape, geo.squareDark, { backgroundColor: "#1E3A5F" }]} />
+      <View
+        style={[geo.shape, geo.squareDark, { backgroundColor: "#1E3A5F" }]}
+      />
       {/* Semicírculo beige abajo */}
-      <View style={[geo.shape, geo.semiBottom, { backgroundColor: "#E8E0D0" }]} />
+      <View
+        style={[geo.shape, geo.semiBottom, { backgroundColor: "#E8E0D0" }]}
+      />
       {/* Círculo pequeño accent abajo-izquierda */}
-      <View style={[geo.shape, geo.circleSm, { backgroundColor: Colors.accent }]} />
+      <View
+        style={[geo.shape, geo.circleSm, { backgroundColor: Colors.accent }]}
+      />
     </View>
   );
 }

@@ -10,7 +10,5 @@ export default function AuthLayout() {
   // Si ya está autenticado, no tiene sentido mostrar auth screens
   if (isSignedIn) return <Redirect href="/(app)/(tabs)/home" />;
 
-  return (
-    <Stack screenOptions={{ headerShown: false, animation: "fade" }} />
-  );
+  return <Stack screenOptions={{ headerShown: false, animation: "fade" }} />;
 }

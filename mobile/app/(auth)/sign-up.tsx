@@ -45,8 +45,7 @@ export default function SignUpScreen() {
       await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
       setStep("verify");
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : t("common.error");
+      const message = err instanceof Error ? err.message : t("common.error");
       Alert.alert("Error", message);
     } finally {
       setLoading(false);
@@ -65,8 +64,7 @@ export default function SignUpScreen() {
         router.replace("/(app)/(tabs)/home");
       }
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : t("common.error");
+      const message = err instanceof Error ? err.message : t("common.error");
       Alert.alert("Error", message);
     } finally {
       setLoading(false);

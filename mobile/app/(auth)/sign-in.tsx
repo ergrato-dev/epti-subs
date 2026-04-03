@@ -40,8 +40,7 @@ export default function SignInScreen() {
         router.replace("/(app)/(tabs)/home");
       }
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : t("common.error");
+      const message = err instanceof Error ? err.message : t("common.error");
       Alert.alert("Error", message);
     } finally {
       setLoading(false);
