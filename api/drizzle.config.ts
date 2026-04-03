@@ -1,4 +1,5 @@
-// @ts-nocheck — Este archivo es ejecutado por drizzle-kit, fuera del tsconfig del src.import { defineConfig } from "drizzle-kit";
+// @ts-nocheck — Este archivo es ejecutado por drizzle-kit, fuera del tsconfig del src.
+import { defineConfig } from "drizzle-kit";
 import { config } from "dotenv";
 
 config({ path: ".env" });

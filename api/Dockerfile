@@ -6,15 +6,17 @@ RUN corepack enable && corepack prepare pnpm@10.30.1 --activate
 
 WORKDIR /app
 
-# Copy only manifests first (layer cache)
-COPY package.json pnpm-lock.yaml ./
+# Copy workspace manifests for layer cache (context = repo root)
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY api/package.json ./api/
 
-# Install production + dev deps (needed to build TypeScript)
-RUN pnpm install --frozen-lockfile
+# Install only api workspace deps
+RUN pnpm install --filter api --frozen-lockfile
 
-# Copy source and compile
-COPY tsconfig.json ./
-COPY src/ ./src/
+# Copy api source and compile
+COPY api/tsconfig.json ./api/
+COPY api/src/ ./api/src/
+WORKDIR /app/api
 RUN pnpm exec tsc
 
 # ─── Stage 2: Production ──────────────────────────────────────────────────────
@@ -24,17 +26,19 @@ RUN corepack enable && corepack prepare pnpm@10.30.1 --activate
 
 WORKDIR /app
 
-# Copy manifests and install ONLY production deps
-COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile --prod
+# Copy workspace manifests and install ONLY production deps
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY api/package.json ./api/
+RUN pnpm install --filter api --frozen-lockfile --prod
 
 # Copy compiled JS from builder
-COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/api/dist ./api/dist
 
 # Non-root user for security (OWASP: least privilege)
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 USER appuser
 
+WORKDIR /app/api
 EXPOSE 3000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \

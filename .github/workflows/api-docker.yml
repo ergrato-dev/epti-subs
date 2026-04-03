@@ -28,7 +28,8 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: ./api
+          context: .                    # root del monorepo — contiene pnpm-lock.yaml
+          file: api/Dockerfile
           target: production
           push: true
           tags: |
