@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -62,6 +62,19 @@ export default function SubscriptionFormScreen() {
   const [form, setForm] = useState<FormState>(INITIAL);
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
+
+  // Estado de los indicadores de scroll del picker de colores
+  const [colorScroll, setColorScroll] = useState({ atStart: true, atEnd: false });
+  const colorContentW = useRef(0);
+  const colorContainerW = useRef(0);
+  function handleColorScroll(x: number) {
+    setColorScroll({
+      atStart: x <= 2,
+      atEnd:
+        colorContentW.current > 0 &&
+        x >= colorContentW.current - colorContainerW.current - 2,
+    });
+  }
 
   useFocusEffect(
     useCallback(() => {
@@ -265,24 +278,45 @@ export default function SubscriptionFormScreen() {
 
         {/* Color */}
         <Label>Color</Label>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.colorScroll}
-          contentContainerStyle={styles.colorRow}
-        >
-          {CARD_COLORS.map((c) => (
-            <Pressable
-              key={c}
-              style={[
-                styles.colorDot,
-                { backgroundColor: c },
-                form.color === c && styles.colorDotActive,
-              ]}
-              onPress={() => set("color", c)}
-            />
-          ))}
-        </ScrollView>
+        <View style={styles.colorPickerWrapper}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            scrollEventThrottle={16}
+            style={styles.colorScroll}
+            contentContainerStyle={styles.colorRow}
+            onScroll={(e) => handleColorScroll(e.nativeEvent.contentOffset.x)}
+            onContentSizeChange={(w) => {
+              colorContentW.current = w;
+              handleColorScroll(0);
+            }}
+            onLayout={(e) => {
+              colorContainerW.current = e.nativeEvent.layout.width;
+            }}
+          >
+            {CARD_COLORS.map((c) => (
+              <Pressable
+                key={c}
+                style={[
+                  styles.colorDot,
+                  { backgroundColor: c },
+                  form.color === c && styles.colorDotActive,
+                ]}
+                onPress={() => set("color", c)}
+              />
+            ))}
+          </ScrollView>
+          {!colorScroll.atStart && (
+            <View style={[styles.colorArrow, styles.colorArrowLeft]} pointerEvents="none">
+              <Text style={styles.colorArrowText}>‹</Text>
+            </View>
+          )}
+          {!colorScroll.atEnd && (
+            <View style={[styles.colorArrow, styles.colorArrowRight]} pointerEvents="none">
+              <Text style={styles.colorArrowText}>›</Text>
+            </View>
+          )}
+        </View>
       </ScrollView>
     </View>
   );
@@ -364,8 +398,32 @@ const styles = StyleSheet.create({
     color: Colors.accent,
     fontWeight: Typography.weights.semibold,
   },
-  colorScroll: {
+  colorPickerWrapper: {
+    position: "relative",
     marginBottom: Spacing.sm,
+  },
+  colorScroll: {},
+  colorArrow: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    width: 24,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1,
+  },
+  colorArrowLeft: {
+    left: 0,
+    backgroundColor: Colors.bg,
+  },
+  colorArrowRight: {
+    right: 0,
+    backgroundColor: Colors.bg,
+  },
+  colorArrowText: {
+    fontSize: Typography.sizes["2xl"],
+    color: Colors.textSecondary,
+    lineHeight: 24,
   },
   colorRow: {
     flexDirection: "row",
