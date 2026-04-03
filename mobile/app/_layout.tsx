@@ -44,7 +44,7 @@ function TokenSync() {
     }
     getToken().then((token) => setAuthToken(token));
     // Identify user in PostHog (no PII — only the opaque Clerk userId)
-    if (userId) posthog.identify(userId);
+    if (userId) posthog?.identify(userId);
   }, [isSignedIn, getToken, userId]);
 
   return null;
