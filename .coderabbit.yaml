@@ -1,0 +1,32 @@
+language: "es-ES"
+
+reviews:
+  auto_review:
+    enabled: true
+    drafts: false
+  poem: false
+  review_status: true
+  request_changes_workflow: true
+
+  path_filters:
+    - "!**/node_modules/**"
+    - "!**/dist/**"
+    - "!**/drizzle/migrations/**"
+    - "!**/.expo/**"
+    - "!**/pnpm-lock.yaml"
+
+  path_instructions:
+    - path: "api/src/**"
+      instructions: |
+        - Enforce OWASP Top 10 security checks on all Express routes.
+        - Verify every protected route uses requireAuth() from @clerk/express.
+        - Flag any raw SQL string concatenation — only Drizzle ORM queries are allowed.
+        - Verify user-owned resources include clerkUserId check (IDOR prevention).
+    - path: "mobile/**"
+      instructions: |
+        - Check that no sensitive data (tokens, keys) is stored in AsyncStorage unencrypted.
+        - Verify all user-facing strings are wrapped with t() from i18next (no hardcoded strings).
+        - Check navigation guards reject unauthenticated users before rendering protected screens.
+
+chat:
+  auto_reply: true

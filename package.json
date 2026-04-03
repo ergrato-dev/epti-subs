@@ -1,0 +1,22 @@
+{
+  "name": "epti-subs",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@clerk/shared",
+      "esbuild"
+    ]
+  },
+  "scripts": {
+    "api:dev": "pnpm --filter api dev",
+    "api:build": "pnpm --filter api build",
+    "api:generate": "pnpm --filter api db:generate",
+    "api:migrate": "pnpm --filter api db:migrate",
+    "api:studio": "pnpm --filter api db:studio"
+  }
+}
