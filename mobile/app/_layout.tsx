@@ -1,10 +1,10 @@
-import '../lib/i18n'; // initialize i18n before anything renders
-import { useEffect } from 'react';
-import { Stack } from 'expo-router';
-import { ClerkProvider, useAuth } from '@clerk/clerk-expo';
-import * as SecureStore from 'expo-secure-store';
-import { StatusBar } from 'expo-status-bar';
-import { setAuthToken } from '../lib/apiClient';
+import "../lib/i18n"; // initialize i18n before anything renders
+import { useEffect } from "react";
+import { Stack } from "expo-router";
+import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
+import * as SecureStore from "expo-secure-store";
+import { StatusBar } from "expo-status-bar";
+import { setAuthToken } from "../lib/apiClient";
 
 // Secure token cache for Clerk — tokens stored encrypted on device
 const tokenCache = {
@@ -22,7 +22,7 @@ const tokenCache = {
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
 if (!publishableKey) {
-  throw new Error('EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY is not set in .env');
+  throw new Error("EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY is not set in .env");
 }
 
 function TokenSync() {
