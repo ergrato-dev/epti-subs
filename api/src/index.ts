@@ -10,9 +10,18 @@ const app: Express = express();
 const PORT = Number(process.env.PORT) || 3000;
 
 // ─── Security / CORS ──────────────────────────────────────────────────────────
+// CORS_ORIGIN acepta un origen único o lista separada por comas, e.g.:
+// "http://localhost:8081,http://192.168.2.6:8081"
+const rawOrigins = process.env.CORS_ORIGIN ?? "http://localhost:8081";
+const allowedOrigins = rawOrigins.split(",").map((o) => o.trim());
+
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN ?? "http://localhost:8081",
+    origin: (origin, cb) => {
+      // Permitir requests sin origin (curl, herramientas de prueba)
+      if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+      cb(new Error(`CORS: origin ${origin} not allowed`));
+    },
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   }),
