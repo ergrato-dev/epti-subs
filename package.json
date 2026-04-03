@@ -9,6 +9,7 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "@clerk/shared",
+      "@shopify/react-native-skia",
       "esbuild"
     ]
   },

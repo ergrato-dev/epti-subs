@@ -1,0 +1,90 @@
+{
+  "common": {
+    "balance": "Balance",
+    "upcoming": "Upcoming",
+    "viewAll": "View all",
+    "allSubscriptions": "All Subscriptions",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "back": "Back",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "perMonth": "per month",
+    "perYear": "per year",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "quarterly": "Quarterly",
+    "weekly": "Weekly",
+    "daily": "Daily",
+    "daysLeft": "{{count}} days left",
+    "history": "History"
+  },
+  "auth": {
+    "welcomeBack": "Welcome back",
+    "signInSubtitle": "Sign in to continue managing your subscriptions",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "noAccount": "New to Epti? {{link}}",
+    "createAccount": "Create an account",
+    "alreadyAccount": "Already have an account? {{link}}",
+    "onboardingTitle": "Gain Financial Clarity",
+    "onboardingSubtitle": "Track, analyze and cancel with ease",
+    "getStarted": "Get Started"
+  },
+  "home": {
+    "greeting": "Hi, {{name}}",
+    "monthlyExpenses": "Monthly expenses",
+    "noUpcoming": "No upcoming payments",
+    "noSubscriptions": "No subscriptions yet"
+  },
+  "subscription": {
+    "title": "My Subscriptions",
+    "add": "New subscription",
+    "name": "Name",
+    "namePlaceholder": "e.g. Netflix",
+    "cost": "Cost",
+    "currency": "Currency",
+    "billingCycle": "Billing cycle",
+    "nextPayment": "Next payment",
+    "plan": "Plan",
+    "planPlaceholder": "e.g. Premium",
+    "paymentLast4": "Last 4 digits",
+    "cancelSubscription": "Cancel Subscription",
+    "cancelConfirm": "Cancel {{name}}?",
+    "cancelConfirmBody": "This will mark the subscription as inactive.",
+    "paymentInfo": "Payment info",
+    "planDetails": "Plan details",
+    "manage": "Manage",
+    "change": "Change"
+  },
+  "insights": {
+    "title": "Monthly Insights",
+    "expenses": "Expenses",
+    "month": "{{month}} {{year}}",
+    "weekDays": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "defaultCurrency": "Default currency",
+    "notifications": "Notifications",
+    "notifyDaysBefore": "Notify {{count}} days before",
+    "language": "Language",
+    "signOut": "Sign out"
+  }
+}

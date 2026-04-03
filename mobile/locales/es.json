@@ -1,0 +1,90 @@
+{
+  "common": {
+    "balance": "Balance",
+    "upcoming": "Próximos pagos",
+    "viewAll": "Ver todos",
+    "allSubscriptions": "Todas las suscripciones",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "add": "Agregar",
+    "back": "Volver",
+    "loading": "Cargando...",
+    "error": "Ocurrió un error",
+    "retry": "Reintentar",
+    "perMonth": "por mes",
+    "perYear": "por año",
+    "monthly": "Mensual",
+    "yearly": "Anual",
+    "quarterly": "Trimestral",
+    "weekly": "Semanal",
+    "daily": "Diario",
+    "daysLeft": "{{count}} días",
+    "history": "Historial"
+  },
+  "auth": {
+    "welcomeBack": "Bienvenido de nuevo",
+    "signInSubtitle": "Inicia sesión para gestionar tus suscripciones",
+    "email": "Correo electrónico",
+    "emailPlaceholder": "Ingresa tu correo",
+    "password": "Contraseña",
+    "passwordPlaceholder": "Ingresa tu contraseña",
+    "signIn": "Iniciar sesión",
+    "signUp": "Crear cuenta",
+    "noAccount": "¿Nuevo en Epti? {{link}}",
+    "createAccount": "Crear cuenta",
+    "alreadyAccount": "¿Ya tienes cuenta? {{link}}",
+    "onboardingTitle": "Claridad Financiera",
+    "onboardingSubtitle": "Rastrea, analiza y cancela con facilidad",
+    "getStarted": "Comenzar"
+  },
+  "home": {
+    "greeting": "Hola, {{name}}",
+    "monthlyExpenses": "Gastos del mes",
+    "noUpcoming": "Sin pagos próximos",
+    "noSubscriptions": "Sin suscripciones aún"
+  },
+  "subscription": {
+    "title": "Mis suscripciones",
+    "add": "Nueva suscripción",
+    "name": "Nombre",
+    "namePlaceholder": "Ej: Netflix",
+    "cost": "Costo",
+    "currency": "Moneda",
+    "billingCycle": "Ciclo de pago",
+    "nextPayment": "Próximo pago",
+    "plan": "Plan",
+    "planPlaceholder": "Ej: Premium",
+    "paymentLast4": "Últimos 4 dígitos",
+    "cancelSubscription": "Cancelar suscripción",
+    "cancelConfirm": "¿Cancelar {{name}}?",
+    "cancelConfirmBody": "Esta acción marcará la suscripción como inactiva.",
+    "paymentInfo": "Info de pago",
+    "planDetails": "Detalles del plan",
+    "manage": "Gestionar",
+    "change": "Cambiar"
+  },
+  "insights": {
+    "title": "Resumen mensual",
+    "expenses": "Gastos",
+    "month": "{{month}} {{year}}",
+    "weekDays": {
+      "mon": "Lun",
+      "tue": "Mar",
+      "wed": "Mié",
+      "thu": "Jue",
+      "fri": "Vie",
+      "sat": "Sáb",
+      "sun": "Dom"
+    }
+  },
+  "settings": {
+    "title": "Configuración",
+    "defaultCurrency": "Moneda por defecto",
+    "notifications": "Notificaciones",
+    "notifyDaysBefore": "Notificar {{count}} días antes",
+    "language": "Idioma",
+    "signOut": "Cerrar sesión"
+  }
+}

@@ -19,7 +19,7 @@ services:
   api:
     build:
       context: ./api
-      target: builder       # usa la stage de build para hot-reload con tsx
+      target: builder # usa la stage de build para hot-reload con tsx
     working_dir: /app
     command: pnpm dev
     ports:
@@ -36,7 +36,7 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - ./api/src:/app/src        # hot-reload: cambios en src se reflejan al instante
+      - ./api/src:/app/src # hot-reload: cambios en src se reflejan al instante
       - ./api/tsconfig.json:/app/tsconfig.json
 
 volumes:
