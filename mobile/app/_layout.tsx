@@ -12,18 +12,19 @@ import posthog from "../lib/posthog";
 // SECURITY: Auth tokens stored exclusively in expo-secure-store (encrypted).
 //
 // Audit checklist:
-//   [x] expo-secure-store@13.x — uses Android Keystore / iOS Keychain.
-//       Does NOT require the ExpoCryptoAES native module, so it works in
-//       both Expo Go (dev) and EAS builds (preview/production).
-//   [x] expo-secure-store v14-v15 was intentionally NOT used — those versions
-//       require the ExpoCryptoAES module absent from Expo Go SDK 54.
-//       v13 peer-dep range accepted by @clerk/clerk-expo (>=13.0.0).
+//   [x] expo-secure-store@15.0.8 — uses Android Keystore / iOS Keychain.
+//       Compatible with Expo Go SDK 54 (bundledNativeModules: ~15.0.8).
+//   [x] ExpoCryptoAES natively absent en SDK 54 fue resuelto pinando
+//       expo-crypto@15.0.8 via pnpm.overrides (v55 lo introducía vía
+//       expo-auth-session@55 ← @clerk/clerk-expo). v15 no tiene ese módulo.
+//   [x] @clerk/clerk-expo peer-dep: expo-secure-store >=12.4.0 ✓
 //   [x] No token value is logged or exposed in error messages.
 // ──────────────────────────────────────────────────────────────────────────
 
 const tokenCache = {
   getToken: (key: string) => SecureStore.getItemAsync(key),
-  saveToken: (key: string, value: string) => SecureStore.setItemAsync(key, value),
+  saveToken: (key: string, value: string) =>
+    SecureStore.setItemAsync(key, value),
   clearToken: (key: string) => SecureStore.deleteItemAsync(key),
 };
 

@@ -8,7 +8,9 @@
   },
   "pnpm": {
     "overrides": {
-      "expo-crypto": "15.0.8"
+      "expo-crypto": "15.0.8",
+      "@shopify/react-native-skia": "2.2.12",
+      "react-native-svg": "15.12.1"
     },
     "onlyBuiltDependencies": [
       "@clerk/shared",

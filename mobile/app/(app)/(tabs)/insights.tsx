@@ -107,7 +107,9 @@ export default function InsightsScreen() {
           style={[styles.navButton, isCurrentMonth && styles.navButtonDisabled]}
           disabled={isCurrentMonth}
         >
-          <Text style={[styles.navArrow, isCurrentMonth && styles.navArrowDisabled]}>
+          <Text
+            style={[styles.navArrow, isCurrentMonth && styles.navArrowDisabled]}
+          >
             {">"}
           </Text>
         </Pressable>
@@ -119,7 +121,9 @@ export default function InsightsScreen() {
         {loading ? (
           <ActivityIndicator color={Colors.accent} />
         ) : (
-          <Text style={styles.totalAmount}>{formatCOP(data?.totalCOP ?? 0)}</Text>
+          <Text style={styles.totalAmount}>
+            {formatCOP(data?.totalCOP ?? 0)}
+          </Text>
         )}
       </View>
 
@@ -139,8 +143,8 @@ export default function InsightsScreen() {
                 v >= 1_000_000
                   ? `${(v / 1_000_000).toFixed(1)}M`
                   : v >= 1_000
-                  ? `${(v / 1_000).toFixed(0)}k`
-                  : String(v),
+                    ? `${(v / 1_000).toFixed(0)}k`
+                    : String(v),
             }}
           >
             {({ points, chartBounds }) => (
