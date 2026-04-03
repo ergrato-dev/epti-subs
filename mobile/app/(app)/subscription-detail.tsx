@@ -11,6 +11,7 @@ import {
 import { useLocalSearchParams, useRouter, useFocusEffect } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useApiClient } from "../../lib/useApiClient";
+import { trackSubscriptionDeleted } from "../../lib/posthog";
 import { Colors } from "../../constants/Colors";
 import { Typography, Spacing, Radius } from "../../constants/Theme";
 import type { Subscription } from "../../types/subscription";
@@ -43,7 +44,7 @@ export default function SubscriptionDetailScreen() {
       request<Subscription>({ method: "GET", url: `/subscriptions/${id}` })
         .then(setSub)
         .finally(() => setLoading(false));
-    }, [ready, id])
+    }, [ready, id]),
   );
 
   async function handleDelete() {
@@ -58,10 +59,11 @@ export default function SubscriptionDetailScreen() {
           style: "destructive",
           onPress: async () => {
             await request({ method: "DELETE", url: `/subscriptions/${id}` });
+            if (sub) trackSubscriptionDeleted(sub.name);
             router.back();
           },
         },
-      ]
+      ],
     );
   }
 
@@ -95,7 +97,10 @@ export default function SubscriptionDetailScreen() {
         </Text>
         <Pressable
           onPress={() =>
-            router.push({ pathname: "/(app)/subscription-form", params: { id: sub.id } })
+            router.push({
+              pathname: "/(app)/subscription-form",
+              params: { id: sub.id },
+            })
           }
         >
           <Text style={styles.editLink}>{t("common.edit")}</Text>
@@ -104,7 +109,12 @@ export default function SubscriptionDetailScreen() {
 
       <ScrollView contentContainerStyle={styles.scroll}>
         {/* ── Hero card ── */}
-        <View style={[styles.heroCard, { backgroundColor: sub.color ?? Colors.accent }]}>
+        <View
+          style={[
+            styles.heroCard,
+            { backgroundColor: sub.color ?? Colors.accent },
+          ]}
+        >
           <Text style={styles.heroName}>{sub.name}</Text>
           <Text style={styles.heroCost}>
             {formatCOP(parseFloat(sub.cost), sub.currency)}
@@ -120,8 +130,8 @@ export default function SubscriptionDetailScreen() {
             {days === 0
               ? "Hoy"
               : days < 0
-              ? "Vencido"
-              : t("common.daysLeft", { count: days })}
+                ? "Vencido"
+                : t("common.daysLeft", { count: days })}
           </Text>
         </View>
 
@@ -140,12 +150,18 @@ export default function SubscriptionDetailScreen() {
             label={t("subscription.nextPayment")}
             value={new Date(sub.nextPaymentDate).toLocaleDateString("es-CO")}
           />
-          <InfoRow label={t("subscription.currency")} value={sub.currency} last />
+          <InfoRow
+            label={t("subscription.currency")}
+            value={sub.currency}
+            last
+          />
         </View>
 
         {/* ── Delete ── */}
         <Pressable style={styles.deleteBtn} onPress={handleDelete}>
-          <Text style={styles.deleteText}>{t("subscription.cancelSubscription")}</Text>
+          <Text style={styles.deleteText}>
+            {t("subscription.cancelSubscription")}
+          </Text>
         </Pressable>
       </ScrollView>
     </View>
@@ -244,7 +260,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingVertical: Spacing.base,
   },
-  infoRowBorder: { borderBottomWidth: 1, borderBottomColor: "rgba(255,255,255,0.06)" },
+  infoRowBorder: {
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(255,255,255,0.06)",
+  },
   infoLabel: { fontSize: Typography.sizes.base, color: Colors.textMuted },
   infoValue: {
     fontSize: Typography.sizes.base,

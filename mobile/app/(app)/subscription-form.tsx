@@ -12,14 +12,26 @@ import {
 import { useLocalSearchParams, useRouter, useFocusEffect } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useApiClient } from "../../lib/useApiClient";
+import { trackSubscriptionCreated } from "../../lib/posthog";
 import { Colors } from "../../constants/Colors";
 import { Typography, Spacing, Radius } from "../../constants/Theme";
 import type { BillingCycle, Subscription } from "../../types/subscription";
 
-const BILLING_CYCLES: BillingCycle[] = ["monthly", "yearly", "quarterly", "weekly", "daily"];
+const BILLING_CYCLES: BillingCycle[] = [
+  "monthly",
+  "yearly",
+  "quarterly",
+  "weekly",
+  "daily",
+];
 const CURRENCIES = ["COP", "USD", "EUR", "MXN", "BRL"];
 const CARD_COLORS = [
-  "#7C3AED", "#0891B2", "#059669", "#D97706", "#DC2626", "#DB2777",
+  "#7C3AED",
+  "#0891B2",
+  "#059669",
+  "#D97706",
+  "#DC2626",
+  "#DB2777",
 ];
 
 interface FormState {
@@ -60,7 +72,10 @@ export default function SubscriptionFormScreen() {
   useFocusEffect(
     useCallback(() => {
       if (!isEdit || !ready) return;
-      request<Subscription>({ method: "GET", url: `/subscriptions/${id}` }).then((sub) => {
+      request<Subscription>({
+        method: "GET",
+        url: `/subscriptions/${id}`,
+      }).then((sub) => {
         setForm({
           name: sub.name,
           cost: sub.cost,
@@ -74,7 +89,7 @@ export default function SubscriptionFormScreen() {
         });
         setLoading(false);
       });
-    }, [ready, id])
+    }, [ready, id]),
   );
 
   function set<K extends keyof FormState>(key: K, value: FormState[K]) {
@@ -105,9 +120,14 @@ export default function SubscriptionFormScreen() {
         logoUrl: form.logoUrl.trim() || null,
       };
       if (isEdit) {
-        await request({ method: "PUT", url: `/subscriptions/${id}`, data: payload });
+        await request({
+          method: "PUT",
+          url: `/subscriptions/${id}`,
+          data: payload,
+        });
       } else {
         await request({ method: "POST", url: "/subscriptions", data: payload });
+        trackSubscriptionCreated(payload.name, payload.billingCycle);
       }
       router.back();
     } catch {
@@ -144,7 +164,10 @@ export default function SubscriptionFormScreen() {
         </Pressable>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        keyboardShouldPersistTaps="handled"
+      >
         {/* Name */}
         <Label>{t("subscription.name")}</Label>
         <TextInput
@@ -175,7 +198,12 @@ export default function SubscriptionFormScreen() {
               style={[styles.chip, form.currency === c && styles.chipActive]}
               onPress={() => set("currency", c)}
             >
-              <Text style={[styles.chipText, form.currency === c && styles.chipTextActive]}>
+              <Text
+                style={[
+                  styles.chipText,
+                  form.currency === c && styles.chipTextActive,
+                ]}
+              >
                 {c}
               </Text>
             </Pressable>
@@ -188,10 +216,18 @@ export default function SubscriptionFormScreen() {
           {BILLING_CYCLES.map((c) => (
             <Pressable
               key={c}
-              style={[styles.chip, form.billingCycle === c && styles.chipActive]}
+              style={[
+                styles.chip,
+                form.billingCycle === c && styles.chipActive,
+              ]}
               onPress={() => set("billingCycle", c)}
             >
-              <Text style={[styles.chipText, form.billingCycle === c && styles.chipTextActive]}>
+              <Text
+                style={[
+                  styles.chipText,
+                  form.billingCycle === c && styles.chipTextActive,
+                ]}
+              >
                 {t(`common.${c}`)}
               </Text>
             </Pressable>
@@ -224,7 +260,9 @@ export default function SubscriptionFormScreen() {
         <TextInput
           style={styles.input}
           value={form.paymentLast4}
-          onChangeText={(v) => set("paymentLast4", v.replace(/\D/g, "").slice(0, 4))}
+          onChangeText={(v) =>
+            set("paymentLast4", v.replace(/\D/g, "").slice(0, 4))
+          }
           placeholder="1234"
           placeholderTextColor={Colors.textMuted}
           keyboardType="number-pad"
@@ -237,7 +275,11 @@ export default function SubscriptionFormScreen() {
           {CARD_COLORS.map((c) => (
             <Pressable
               key={c}
-              style={[styles.colorDot, { backgroundColor: c }, form.color === c && styles.colorDotActive]}
+              style={[
+                styles.colorDot,
+                { backgroundColor: c },
+                form.color === c && styles.colorDotActive,
+              ]}
               onPress={() => set("color", c)}
             />
           ))}
@@ -314,10 +356,20 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "transparent",
   },
-  chipActive: { borderColor: Colors.accent, backgroundColor: "rgba(6,182,212,0.12)" },
+  chipActive: {
+    borderColor: Colors.accent,
+    backgroundColor: "rgba(6,182,212,0.12)",
+  },
   chipText: { fontSize: Typography.sizes.sm, color: Colors.textSecondary },
-  chipTextActive: { color: Colors.accent, fontWeight: Typography.weights.semibold },
-  colorRow: { flexDirection: "row", gap: Spacing.base, marginBottom: Spacing.sm },
+  chipTextActive: {
+    color: Colors.accent,
+    fontWeight: Typography.weights.semibold,
+  },
+  colorRow: {
+    flexDirection: "row",
+    gap: Spacing.base,
+    marginBottom: Spacing.sm,
+  },
   colorDot: { width: 32, height: 32, borderRadius: 16 },
   colorDotActive: {
     borderWidth: 3,

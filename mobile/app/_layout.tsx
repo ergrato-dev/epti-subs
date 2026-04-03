@@ -5,6 +5,8 @@ import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
 import * as SecureStore from "expo-secure-store";
 import { StatusBar } from "expo-status-bar";
 import { setAuthToken } from "../lib/apiClient";
+import { requestNotificationPermission } from "../lib/notifications";
+import posthog from "../lib/posthog";
 
 // Secure token cache for Clerk — tokens stored encrypted on device
 const tokenCache = {
@@ -26,7 +28,7 @@ if (!publishableKey) {
 }
 
 function TokenSync() {
-  const { getToken, isSignedIn } = useAuth();
+  const { getToken, isSignedIn, userId } = useAuth();
 
   useEffect(() => {
     if (!isSignedIn) {
@@ -34,14 +36,25 @@ function TokenSync() {
       return;
     }
     getToken().then((token) => setAuthToken(token));
-  }, [isSignedIn, getToken]);
+    // Identify user in PostHog (no PII — only the opaque Clerk userId)
+    if (userId) posthog.identify(userId);
+  }, [isSignedIn, getToken, userId]);
 
+  return null;
+}
+
+function AppBootstrap() {
+  useEffect(() => {
+    // Request notification permissions once on first launch
+    requestNotificationPermission();
+  }, []);
   return null;
 }
 
 export default function RootLayout() {
   return (
     <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
+      <AppBootstrap />
       <TokenSync />
       <StatusBar style="light" backgroundColor="#0A1628" />
       <Stack screenOptions={{ headerShown: false }} />

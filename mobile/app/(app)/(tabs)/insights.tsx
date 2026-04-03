@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { useFocusEffect } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { VictoryBar, VictoryChart, VictoryAxis, VictoryTheme } from "victory-native";
+import { CartesianChart, Bar } from "victory-native";
 import { useApiClient } from "../../../lib/useApiClient";
 import { Colors } from "../../../constants/Colors";
 import { Typography, Spacing, Radius } from "../../../constants/Theme";
@@ -53,7 +53,7 @@ export default function InsightsScreen() {
   useFocusEffect(
     useCallback(() => {
       if (ready) loadData(year, month);
-    }, [ready, year, month])
+    }, [ready, year, month]),
   );
 
   function prevMonth() {
@@ -78,25 +78,26 @@ export default function InsightsScreen() {
     }
   }
 
-  const isCurrentMonth = year === now.getFullYear() && month === now.getMonth() + 1;
+  const isCurrentMonth =
+    year === now.getFullYear() && month === now.getMonth() + 1;
 
-  const chartData = data?.breakdown.map((item, index) => ({
-    x: index + 1,
-    y: parseFloat(item.cost),
-    label: item.subscriptionName,
-  })) ?? [];
+  // victory-native v41 API: array of plain objects with numeric values
+  const chartData = (data?.breakdown ?? []).map((item, index) => ({
+    index: index + 1,
+    value: parseFloat(item.cost),
+  }));
 
   return (
     <ScrollView style={styles.scroll} contentContainerStyle={styles.container}>
-      {/* ── Header ── */}
+      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>{t("insights.title")}</Text>
       </View>
 
-      {/* ── Month navigator ── */}
+      {/* Month navigator */}
       <View style={styles.monthNav}>
         <Pressable onPress={prevMonth} style={styles.navButton}>
-          <Text style={styles.navArrow}>‹</Text>
+          <Text style={styles.navArrow}>{"<"}</Text>
         </Pressable>
         <Text style={styles.monthLabel}>
           {t("insights.month", { month: twoDigits(month), year })}
@@ -106,11 +107,13 @@ export default function InsightsScreen() {
           style={[styles.navButton, isCurrentMonth && styles.navButtonDisabled]}
           disabled={isCurrentMonth}
         >
-          <Text style={[styles.navArrow, isCurrentMonth && styles.navArrowDisabled]}>›</Text>
+          <Text style={[styles.navArrow, isCurrentMonth && styles.navArrowDisabled]}>
+            {">"}
+          </Text>
         </Pressable>
       </View>
 
-      {/* ── Total ── */}
+      {/* Total */}
       <View style={styles.totalCard}>
         <Text style={styles.totalLabel}>{t("insights.expenses")}</Text>
         {loading ? (
@@ -120,57 +123,52 @@ export default function InsightsScreen() {
         )}
       </View>
 
-      {/* ── Bar chart ── */}
+      {/* Bar chart — victory-native v41 API */}
       {!loading && chartData.length > 0 && (
         <View style={styles.chartContainer}>
-          <VictoryChart
-            theme={VictoryTheme.grayscale}
-            domainPadding={20}
-            height={220}
-            padding={{ top: 20, bottom: 50, left: 60, right: 20 }}
-          >
-            <VictoryAxis
-              style={{
-                axis: { stroke: Colors.textMuted },
-                tickLabels: { fill: Colors.textMuted, fontSize: 10 },
-              }}
-            />
-            <VictoryAxis
-              dependentAxis
-              tickFormat={(v: number) =>
+          <CartesianChart
+            data={chartData}
+            xKey="index"
+            yKeys={["value"]}
+            domainPadding={{ left: 20, right: 20 }}
+            axisOptions={{
+              labelColor: Colors.textMuted,
+              lineColor: Colors.textMuted,
+              tickCount: { x: chartData.length, y: 4 },
+              formatYLabel: (v: number) =>
                 v >= 1_000_000
                   ? `${(v / 1_000_000).toFixed(1)}M`
                   : v >= 1_000
                   ? `${(v / 1_000).toFixed(0)}k`
-                  : String(v)
-              }
-              style={{
-                axis: { stroke: Colors.textMuted },
-                tickLabels: { fill: Colors.textMuted, fontSize: 10 },
-                grid: { stroke: "rgba(255,255,255,0.06)" },
-              }}
-            />
-            <VictoryBar
-              data={chartData}
-              style={{ data: { fill: Colors.accent, borderRadius: 4 } }}
-              cornerRadius={{ top: 4 }}
-            />
-          </VictoryChart>
+                  : String(v),
+            }}
+          >
+            {({ points, chartBounds }) => (
+              <Bar
+                points={points.value}
+                chartBounds={chartBounds}
+                color={Colors.accent}
+                roundedCorners={{ topLeft: 4, topRight: 4 }}
+              />
+            )}
+          </CartesianChart>
         </View>
       )}
 
-      {/* ── Breakdown list ── */}
+      {/* Breakdown list */}
       {!loading && (data?.breakdown.length ?? 0) === 0 && (
         <Text style={styles.empty}>{t("home.noSubscriptions")}</Text>
       )}
 
       {!loading &&
         data?.breakdown.map((item) => (
-          <View key={item.subscriptionId} style={styles.breakdownRow}>
+          <View key={item.id} style={styles.breakdownRow}>
             <Text style={styles.breakdownName} numberOfLines={1}>
-              {item.subscriptionName}
+              {item.name}
             </Text>
-            <Text style={styles.breakdownCost}>{formatCOP(parseFloat(item.cost))}</Text>
+            <Text style={styles.breakdownCost}>
+              {formatCOP(parseFloat(item.cost))}
+            </Text>
           </View>
         ))}
     </ScrollView>
@@ -192,9 +190,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: Spacing.base,
   },
-  navButton: {
-    padding: Spacing.sm,
-  },
+  navButton: { padding: Spacing.sm },
   navButtonDisabled: { opacity: 0.3 },
   navArrow: {
     fontSize: Typography.sizes["2xl"],
@@ -229,6 +225,7 @@ const styles = StyleSheet.create({
     borderRadius: Radius.xl,
     marginBottom: Spacing.lg,
     overflow: "hidden",
+    height: 220,
   },
   breakdownRow: {
     flexDirection: "row",

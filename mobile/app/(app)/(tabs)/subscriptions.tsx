@@ -29,7 +29,10 @@ export default function SubscriptionsScreen() {
 
   async function loadData() {
     try {
-      const data = await request<Subscription[]>({ method: "GET", url: "/subscriptions" });
+      const data = await request<Subscription[]>({
+        method: "GET",
+        url: "/subscriptions",
+      });
       setSubs(data);
     } finally {
       setLoading(false);
@@ -40,7 +43,7 @@ export default function SubscriptionsScreen() {
   useFocusEffect(
     useCallback(() => {
       if (ready) loadData();
-    }, [ready])
+    }, [ready]),
   );
 
   function toggleExpand(id: number) {
@@ -59,11 +62,14 @@ export default function SubscriptionsScreen() {
           text: t("common.delete"),
           style: "destructive",
           onPress: async () => {
-            await request({ method: "DELETE", url: `/subscriptions/${sub.id}` });
+            await request({
+              method: "DELETE",
+              url: `/subscriptions/${sub.id}`,
+            });
             loadData();
           },
         },
-      ]
+      ],
     );
   }
 
@@ -119,14 +125,20 @@ export default function SubscriptionsScreen() {
                 <View style={styles.expandedPanel}>
                   {item.planName ? (
                     <View style={styles.infoRow}>
-                      <Text style={styles.infoLabel}>{t("subscription.plan")}</Text>
+                      <Text style={styles.infoLabel}>
+                        {t("subscription.plan")}
+                      </Text>
                       <Text style={styles.infoValue}>{item.planName}</Text>
                     </View>
                   ) : null}
                   {item.paymentLast4 ? (
                     <View style={styles.infoRow}>
-                      <Text style={styles.infoLabel}>{t("subscription.paymentLast4")}</Text>
-                      <Text style={styles.infoValue}>•••• {item.paymentLast4}</Text>
+                      <Text style={styles.infoLabel}>
+                        {t("subscription.paymentLast4")}
+                      </Text>
+                      <Text style={styles.infoValue}>
+                        •••• {item.paymentLast4}
+                      </Text>
                     </View>
                   ) : null}
                   <View style={styles.expandedActions}>
@@ -189,7 +201,11 @@ const styles = StyleSheet.create({
     color: "#fff",
     lineHeight: 28,
   },
-  list: { padding: Spacing.base, gap: Spacing.sm, paddingBottom: Spacing["3xl"] },
+  list: {
+    padding: Spacing.base,
+    gap: Spacing.sm,
+    paddingBottom: Spacing["3xl"],
+  },
   empty: { fontSize: Typography.sizes.base, color: Colors.textMuted },
   expandedPanel: {
     backgroundColor: Colors.bgCardAlt,
@@ -215,7 +231,11 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
     fontWeight: Typography.weights.semibold,
   },
-  expandedActions: { flexDirection: "row", gap: Spacing.sm, marginTop: Spacing.xs },
+  expandedActions: {
+    flexDirection: "row",
+    gap: Spacing.sm,
+    marginTop: Spacing.xs,
+  },
   actionBtn: {
     flex: 1,
     paddingVertical: Spacing.sm,
@@ -228,7 +248,11 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.semibold,
   },
-  cancelBtn: { backgroundColor: "rgba(239,68,68,0.15)", borderWidth: 1, borderColor: Colors.danger },
+  cancelBtn: {
+    backgroundColor: "rgba(239,68,68,0.15)",
+    borderWidth: 1,
+    borderColor: Colors.danger,
+  },
   cancelBtnText: {
     color: Colors.danger,
     fontSize: Typography.sizes.sm,

@@ -12,16 +12,18 @@ import { useRouter } from "expo-router";
 import { useUser } from "@clerk/clerk-expo";
 import { useTranslation } from "react-i18next";
 import { useApiClient } from "../../../lib/useApiClient";
+import { useUserPrefs } from "../../../lib/useUserPrefs";
 import { SubscriptionCard } from "../../../components/SubscriptionCard";
+import { trackScreenView } from "../../../lib/posthog";
 import { Colors } from "../../../constants/Colors";
 import { Typography, Spacing, Radius } from "../../../constants/Theme";
 import type { Subscription } from "../../../types/subscription";
 
-function formatCOP(amount: number) {
+function formatAmount(amount: number, currency: string) {
   return new Intl.NumberFormat("es-CO", {
     style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
+    currency,
+    maximumFractionDigits: currency === "COP" ? 0 : 2,
   }).format(amount);
 }
 
@@ -30,10 +32,11 @@ export default function HomeScreen() {
   const { user } = useUser();
   const router = useRouter();
   const { request, ready } = useApiClient();
+  const { prefs } = useUserPrefs();
 
   const [upcoming, setUpcoming] = useState<Subscription[]>([]);
   const [all, setAll] = useState<Subscription[]>([]);
-  const [totalCOP, setTotalCOP] = useState(0);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -42,15 +45,18 @@ export default function HomeScreen() {
   async function loadData() {
     try {
       const [upcomingData, allData] = await Promise.all([
-        request<Subscription[]>({ method: "GET", url: "/subscriptions/upcoming" }),
+        request<Subscription[]>({
+          method: "GET",
+          url: "/subscriptions/upcoming",
+        }),
         request<Subscription[]>({ method: "GET", url: "/subscriptions" }),
       ]);
       setUpcoming(upcomingData);
       setAll(allData);
-      const cop = allData
-        .filter((s) => s.currency === "COP")
-        .reduce((sum, s) => sum + parseFloat(s.cost), 0);
-      setTotalCOP(cop);
+      const sum = allData
+        .filter((s) => s.currency === prefs.currency)
+        .reduce((acc, s) => acc + parseFloat(s.cost), 0);
+      setTotal(sum);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -58,22 +64,30 @@ export default function HomeScreen() {
   }
 
   useEffect(() => {
-    if (ready) loadData();
-  }, [ready]);
+    if (ready) {
+      loadData();
+      trackScreenView("home");
+    }
+  }, [ready, prefs.currency]);
 
   function onRefresh() {
     setRefreshing(true);
     loadData();
   }
 
-  const firstName = user?.firstName ?? user?.emailAddresses[0]?.emailAddress ?? "";
+  const firstName =
+    user?.firstName ?? user?.emailAddresses[0]?.emailAddress ?? "";
 
   return (
     <ScrollView
       style={styles.scroll}
       contentContainerStyle={styles.container}
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.accent} />
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          tintColor={Colors.accent}
+        />
       }
     >
       {/* ── Header ── */}
@@ -94,9 +108,12 @@ export default function HomeScreen() {
       {/* ── Balance card ── */}
       <View style={styles.balanceCard}>
         <Text style={styles.balanceLabel}>{t("common.balance")}</Text>
-        <Text style={styles.balanceAmount}>{formatCOP(totalCOP)}</Text>
+        <Text style={styles.balanceAmount}>
+          {formatAmount(total, prefs.currency)}
+        </Text>
         <Text style={styles.balanceDate}>
-          {String(now.getMonth() + 1).padStart(2, "0")}/{String(now.getFullYear()).slice(2)}
+          {String(now.getMonth() + 1).padStart(2, "0")}/
+          {String(now.getFullYear()).slice(2)}
         </Text>
       </View>
 
@@ -109,7 +126,10 @@ export default function HomeScreen() {
       </View>
 
       {loading ? (
-        <ActivityIndicator color={Colors.accent} style={{ marginVertical: Spacing.xl }} />
+        <ActivityIndicator
+          color={Colors.accent}
+          style={{ marginVertical: Spacing.xl }}
+        />
       ) : upcoming.length === 0 ? (
         <Text style={styles.empty}>{t("home.noUpcoming")}</Text>
       ) : (
@@ -124,7 +144,10 @@ export default function HomeScreen() {
               subscription={sub}
               compact
               onPress={() =>
-                router.push({ pathname: "/(app)/subscription-detail", params: { id: sub.id } })
+                router.push({
+                  pathname: "/(app)/subscription-detail",
+                  params: { id: sub.id },
+                })
               }
             />
           ))}
@@ -147,7 +170,10 @@ export default function HomeScreen() {
             key={sub.id}
             subscription={sub}
             onPress={() =>
-              router.push({ pathname: "/(app)/subscription-detail", params: { id: sub.id } })
+              router.push({
+                pathname: "/(app)/subscription-detail",
+                params: { id: sub.id },
+              })
             }
           />
         ))
