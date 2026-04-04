@@ -2,7 +2,7 @@
 
 Gestor personal de suscripciones. Monorepo con API REST y app móvil (Android).
 
-> ⚠️ **Antes de tocar dependencias:** consultar [`docs/compatibility.md`](docs/compatibility.md)
+> ⚠️ **Antes de tocar dependencias:** consultar [`_docs/compatibility.md`](_docs/compatibility.md)
 
 ## Roadmap
 
