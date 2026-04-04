@@ -45,18 +45,22 @@ Ir a **Settings** (ícono de engranaje en el sidebar izquierdo) → **API**
 Ahí vas a ver varias claves. Las que necesitas son estas tres:
 
 ### Project URL
+
 ```
 https://abcdefghijklmnop.supabase.co
 ```
+
 → va a `EXPO_PUBLIC_SUPABASE_URL` en `mobile/.env`
 
 ### anon / public key
+
 Es la clave larga que empieza con `eyJ...` bajo el título **Project API keys → anon public**.
 → va a `EXPO_PUBLIC_SUPABASE_ANON_KEY` en `mobile/.env`
 
 > Esta clave es pública — es seguro incluirla en la app mobile. Lo que la hace segura no es que sea secreta, sino que Supabase la usa para identificar tu proyecto y aplicar las reglas de acceso (RLS).
 
 ### JWT Secret
+
 Bajar en la misma página hasta **JWT Settings** → copiar el valor de **JWT Secret**.
 → va a `SUPABASE_JWT_SECRET` en `api/.env`
 
@@ -114,6 +118,7 @@ pnpm --filter api db:migrate
 ```
 
 Esto lee las migraciones de `api/drizzle/migrations/` y las aplica en orden:
+
 - `0000_open_tigra.sql` — crea las tablas `subscriptions` y `categories`
 - `0001_absurd_landau.sql` — renombra una columna interna (no visible para el usuario)
 
@@ -168,12 +173,12 @@ CREATE POLICY "read_categories" ON categories
 
 Ir a **Authentication** (ícono de usuario en el sidebar) → **Settings**:
 
-| Campo | Valor | Por qué |
-|---|---|---|
-| **Site URL** | `http://localhost:8081` | Para que los emails de verificación redirijan al lugar correcto en desarrollo |
-| **Confirm email** | ✅ Habilitado | El sign-up manda un código OTP al email — la app lo pide y lo verifica |
-| **Secure email change** | ✅ Habilitado | Protección extra si el usuario cambia su email |
-| **JWT expiry** | `3600` (default) | El token expira en 1 hora; se renueva automáticamente en background |
+| Campo                   | Valor                   | Por qué                                                                       |
+| ----------------------- | ----------------------- | ----------------------------------------------------------------------------- |
+| **Site URL**            | `http://localhost:8081` | Para que los emails de verificación redirijan al lugar correcto en desarrollo |
+| **Confirm email**       | ✅ Habilitado           | El sign-up manda un código OTP al email — la app lo pide y lo verifica        |
+| **Secure email change** | ✅ Habilitado           | Protección extra si el usuario cambia su email                                |
+| **JWT expiry**          | `3600` (default)        | El token expira en 1 hora; se renueva automáticamente en background           |
 
 > **¿Qué es el OTP del sign-up?** Cuando el usuario se registra, Supabase manda un email con un código de 6 dígitos. La app de sign-up tiene una pantalla que pide ese código y llama a `supabase.auth.verifyOtp()` para confirmar la cuenta. Si **Confirm email** está deshabilitado, el usuario entra directo sin verificar — no recomendado en producción.
 
@@ -217,4 +222,3 @@ Una vez que el proyecto funciona en desarrollo, para subir a producción:
 3. Push a `main` → GitHub Actions construye la imagen Docker → deploy automático en `subs-api.ergrato.dev`
 
 > Para correr migraciones en producción usar la URL de **Session mode** (puerto `5432`), no el pooler — el pooler no soporta las sentencias de DDL que usan las migraciones.
-
