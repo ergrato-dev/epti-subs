@@ -17,11 +17,11 @@ El proyecto usa Supabase Auth (JWT) + PostgreSQL gestionado.
 
 **Dashboard → Settings → API**
 
-| Variable | Dónde está | Para qué |
-|---|---|---|
-| `EXPO_PUBLIC_SUPABASE_URL` | Project URL | Cliente Supabase en mobile |
-| `EXPO_PUBLIC_SUPABASE_ANON_KEY` | `anon` `public` | Cliente Supabase en mobile |
-| `SUPABASE_JWT_SECRET` | JWT Settings → JWT Secret | Verificación local de tokens en API |
+| Variable                        | Dónde está                | Para qué                            |
+| ------------------------------- | ------------------------- | ----------------------------------- |
+| `EXPO_PUBLIC_SUPABASE_URL`      | Project URL               | Cliente Supabase en mobile          |
+| `EXPO_PUBLIC_SUPABASE_ANON_KEY` | `anon` `public`           | Cliente Supabase en mobile          |
+| `SUPABASE_JWT_SECRET`           | JWT Settings → JWT Secret | Verificación local de tokens en API |
 
 > ⚠️ Nunca usar la `service_role` key en el cliente mobile — solo la `anon` key.
 
@@ -109,12 +109,12 @@ CREATE POLICY "read_categories" ON categories
 
 **Dashboard → Authentication → Settings**
 
-| Opción | Valor recomendado |
-|---|---|
-| Site URL | `http://localhost:8081` (dev) / URL de producción |
-| Confirm email | Habilitar (activa el flow de OTP en sign-up) |
-| Secure email change | Habilitar |
-| JWT expiry | `3600` (1 hora, default) |
+| Opción              | Valor recomendado                                 |
+| ------------------- | ------------------------------------------------- |
+| Site URL            | `http://localhost:8081` (dev) / URL de producción |
+| Confirm email       | Habilitar (activa el flow de OTP en sign-up)      |
+| Secure email change | Habilitar                                         |
+| JWT expiry          | `3600` (1 hora, default)                          |
 
 > El flow de sign-up usa `supabase.auth.verifyOtp({ type: 'signup' })`, lo que requiere que **Confirm email** esté habilitado.
 
